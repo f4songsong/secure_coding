@@ -9,7 +9,7 @@ if USE_LOCALHOST:
 else:
     API_URL = "http://192.168.200.123:8000/ping" 
 
-st.title("기본페이지로 이동해주세요!")
+st.title("오늘 하루도 힘내세요!")
 
 # 백엔드에 GET 요청 보내기
 try:
