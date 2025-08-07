@@ -25,10 +25,10 @@ def get_user(email):
     db = SessionLocal()
     try:
         result = db.execute(text("""
-            SELECT email, password, name FROM person WHERE email = :email
+            SELECT email, password, name, is_admin FROM person WHERE email = :email
         """), {"email": email})
         user = result.fetchone()
-        return user  # (email, hashed_password, name) or None
+        return user  # (email, hashed_password, name, is_admin) or None
     finally:
         db.close()
 
@@ -46,17 +46,17 @@ def login_form():
     if submitted:
         user = get_user(email)
         if user:
-            db_email, db_hashed_password, db_name = user
+            db_email, db_hashed_password, db_name, is_admin = user  # 수정된 부분
             if verify_password(password, db_hashed_password):
                 st.success(f"환영합니다, {db_name} 님!")
                 st.session_state['authenticated'] = True
                 st.session_state['name'] = db_name
+                st.session_state['is_admin'] = (is_admin == 1)  # 관리자 여부 저장
                 st.rerun()
             else:
                 st.error("비밀번호가 일치하지 않습니다.")
         else:
             st.error("존재하지 않는 사용자입니다.")
-
 # ---------------------
 # 실행
 # ---------------------
@@ -67,6 +67,11 @@ if not st.session_state['authenticated']:
     login_form()
 else:
     st.success(f"{st.session_state['name']} 님, 이미 로그인되어 있습니다.")
+    if st.session_state.get('is_admin'):
+        st.info("관리자 계정입니다.")
+        # 여기서 관리자 메뉴나 기능으로 넘어가도록 연결 가능
+    else:
+        st.info("일반 사용자 계정입니다.")
     if st.button("로그아웃"):
         st.session_state.clear()
-        st.experimental_rerun()
+        st.rerun()
