@@ -85,11 +85,23 @@ def save_record(is_public):
 
 
 # 저장 버튼
-col1, col2 = st.columns(2)
-with col1:
-    if st.button("🔒 비공개 저장"):
-        save_record(is_public=False)
+# ✅ 기록 저장 여부 상태 초기화
+if 'record_saved' not in st.session_state:
+    st.session_state.record_saved = False
 
-with col2:
-    if st.button("🌐 공개 저장"):
-        save_record(is_public=True)
+# ✅ 공개 여부 선택 (한 번만 선택 가능)
+visibility = st.radio(
+    "공개 여부 선택",
+    ("비공개", "공개"),
+    disabled=st.session_state.record_saved  # 이미 저장되었으면 비활성화
+)
+
+# ✅ 저장 버튼 (한 번만 클릭 가능)
+if st.button("💾 기록 저장", disabled=st.session_state.record_saved):
+    save_record(is_public=(visibility == "공개"))
+    st.session_state.record_saved = True  # 저장 완료 표시
+    st.success("기록이 저장되었습니다. 다시 저장할 수 없습니다.")
+
+# ✅ 안내 메시지
+if st.session_state.record_saved:
+    st.info("이미 기록을 저장했습니다. 다시 저장할 수 없습니다.")
