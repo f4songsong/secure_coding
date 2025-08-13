@@ -6,6 +6,9 @@ import random
 from passlib.context import CryptContext
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 
 # 비밀번호 해시 설정
@@ -18,8 +21,11 @@ def hash_password(password: str) -> str:
 def send_verification_email(to_email, code):
     smtp_server = 'smtp.gmail.com'
     smtp_port = 587
-    sender_email = 'checkemail448@gmail.com'
-    sender_password = 'ntkp yxiq zknr yjvw'
+    sender_email = os.getenv("SMTP_EMAIL")
+    sender_password = os.getenv("SMTP_PASSWORD")
+
+    if not sender_email or not sender_password:
+        raise ValueError("SMTP 환경변수가 설정되지 않았습니다.")
 
     subject = '회원가입 이메일 인증 코드'
     body = f'인증 코드는 {code} 입니다.'

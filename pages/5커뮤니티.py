@@ -26,5 +26,5 @@ else:
             """, (record_id,))
             details = cursor.fetchall()
             for block_type, detail, started_at, ended_at, time_at in details:
-                st.markdown(f"**[{block_type}]** {detail}")
+                st.text(f"[{block_type}] {detail}")
                 st.caption(f"🕒 {started_at} ~ {ended_at} (⏱️ {time_at}초)")

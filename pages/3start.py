@@ -33,7 +33,12 @@ if not records:
 else:
     for record_id, title, created_at, is_public in records:
         with st.expander(f"📌 {title} ({created_at})"):
-            # 📍 수정 및 삭제 폼
+            cursor.execute("SELECT person_id FROM record WHERE record_id = ?", (record_id,))
+            owner_row = cursor.fetchone()
+            if not owner_row or owner_row[0] != person_id:
+                st.error("⚠️ 권한이 없습니다.")
+                continue
+            # 수정 및 삭제 폼
             with st.form(f"form_{record_id}"):
                 new_title = st.text_input("제목 수정", value=title, key=f"title_{record_id}")
                 new_is_public = st.selectbox("공개 여부", ["공개", "비공개"], index=0 if is_public else 1, key=f"pub_{record_id}")
@@ -56,7 +61,7 @@ else:
                         conn.commit()
                         st.success("변경 사항이 저장되었습니다.")
 
-            # 📋 상세 내용 표시
+            # 상세 내용 표시
             cursor.execute("""
                 SELECT block_type, detail, started_at, ended_at, time_at
                 FROM detail WHERE record_id = ?
@@ -64,5 +69,5 @@ else:
             details = cursor.fetchall()
 
             for block_type, detail, started_at, ended_at, time_at in details:
-                st.markdown(f"**[{block_type}]** {detail}")
+                st.text(f"[{block_type}] {detail}")
                 st.caption(f"🕒 {started_at} ~ {ended_at} (⏱️ {time_at}초)")

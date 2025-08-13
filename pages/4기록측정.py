@@ -18,7 +18,7 @@ if 'ended_at' not in st.session_state:
 if 'time_at' not in st.session_state:
     st.session_state.time_at = None
 
-# 사용자 ID 가져오기 (예시용으로 name을 세션에서 가져옴)
+# 사용자 ID 가져오기
 if 'name' not in st.session_state:
     st.warning("로그인이 필요합니다.")
     st.stop()
@@ -50,14 +50,13 @@ detail_text = st.text_area("내용")
 block_type = st.selectbox("블록 타입", ["text", "todo", "code", "image", "etc"])
 
 # 저장 함수 (공개 여부 추가)
-# 🔧 수정된 save_record 함수
 def save_record(is_public):
     if not title or not detail_text:
         st.error("제목과 내용을 모두 입력해주세요.")
     elif not st.session_state.started_at or not st.session_state.ended_at:
         st.error("시간 측정 후 저장해주세요.")
     else:
-        # ✅ 1. record 저장 (is_public 포함) — ALTER TABLE 제거됨
+        #  1. record 저장 (is_public 포함)
         cursor.execute("""
             INSERT INTO record (person_id, title, is_public, created_at, updated_at)
             VALUES (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
@@ -65,7 +64,7 @@ def save_record(is_public):
 
         record_id = cursor.lastrowid
 
-        # ✅ 2. detail 저장
+        #  2. detail 저장
         cursor.execute("""
             INSERT INTO detail (
                 record_id, block_type, detail,
@@ -85,23 +84,23 @@ def save_record(is_public):
 
 
 # 저장 버튼
-# ✅ 기록 저장 여부 상태 초기화
+#  기록 저장 여부 상태 초기화
 if 'record_saved' not in st.session_state:
     st.session_state.record_saved = False
 
-# ✅ 공개 여부 선택 (한 번만 선택 가능)
+#  공개 여부 선택 (한 번만 선택 가능)
 visibility = st.radio(
     "공개 여부 선택",
     ("비공개", "공개"),
     disabled=st.session_state.record_saved  # 이미 저장되었으면 비활성화
 )
 
-# ✅ 저장 버튼 (한 번만 클릭 가능)
+#  저장 버튼 (한 번만 클릭 가능)
 if st.button("💾 기록 저장", disabled=st.session_state.record_saved):
     save_record(is_public=(visibility == "공개"))
     st.session_state.record_saved = True  # 저장 완료 표시
     st.success("기록이 저장되었습니다. 다시 저장할 수 없습니다.")
 
-# ✅ 안내 메시지
+#  안내 메시지
 if st.session_state.record_saved:
     st.info("이미 기록을 저장했습니다. 다시 저장할 수 없습니다.")

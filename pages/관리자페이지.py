@@ -20,7 +20,7 @@ def show_user_management():
                 cursor.execute("DELETE FROM person WHERE person_id = ?", (person_id,))
                 conn.commit()
                 st.success(f"사용자 {name} 탈퇴 처리 완료")
-                st.rerun()  # 최신 Streamlit에서는 st.experimental_rerun → st.rerun
+                st.rerun()  
 
 # 게시글 관리 화면
 def show_post_management():
