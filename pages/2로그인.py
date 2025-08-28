@@ -34,6 +34,8 @@ if 'login_attempts' not in st.session_state:
 if 'lock_until' not in st.session_state:
     st.session_state['lock_until'] = None
 
+if 'authenticated' not in st.session_state:
+    st.session_state['authenticated'] = False
 
 
 # 로그인 폼
@@ -69,6 +71,12 @@ def login_form():
                 #로그인 성공 시 시도 횟수 초기화
                 st.session_state['login_attempts'] = 0
                 st.session_state['lock_until'] = None
+                #비밀번호는 메모리에서 즉시 삭제
+                del password
+                if "비밀번호" in st.session_state:
+                    del st.session_state["비밀번호"]
+
+                st.success(f"환영합니다, {db_name} 님!")
                 st.rerun()
             else:
                 #로그인 실패 시 시도 증가 및 잠금 적용
@@ -78,9 +86,9 @@ def login_form():
                     st.session_state['lock_until'] = datetime.now() + timedelta(minutes=5)
                     st.error("비밀번호 5회 실패. 5분 동안 잠겼습니다.")
                 else:
-                    st.error(f"비밀번호가 일치하지 않습니다. 남은 시도: {remaining_attempts}")
+                    st.error(f"이메일 또는 비밀번호가 일치 하지 않습니다")
         else:
-            st.error("존재하지 않는 사용자입니다.")
+            st.error("이메일 또는 비밀번호가 일치 하지 않습니다")
 
 # 실행
 if 'authenticated' not in st.session_state:
@@ -94,6 +102,7 @@ else:
         st.info("관리자 계정입니다.")
     else:
         st.info("일반 사용자 계정입니다.")
+    
     if st.button("로그아웃"):
-        st.session_state.clear()
+        st.session_state.clear()  # 모든 세션 초기화
         st.rerun()

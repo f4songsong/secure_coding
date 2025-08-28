@@ -99,8 +99,14 @@ visibility = st.radio(
 if st.button("💾 기록 저장", disabled=st.session_state.record_saved):
     save_record(is_public=(visibility == "공개"))
     st.session_state.record_saved = True  # 저장 완료 표시
-    st.success("기록이 저장되었습니다. 다시 저장할 수 없습니다.")
 
 #  안내 메시지
 if st.session_state.record_saved:
     st.info("이미 기록을 저장했습니다. 다시 저장할 수 없습니다.")
+    if st.button("🆕 새 기록 작성"):
+        # 세션 상태 초기화
+        st.session_state.started_at = None
+        st.session_state.ended_at = None
+        st.session_state.time_at = None
+        st.session_state.record_saved = False
+        st.rerun()
